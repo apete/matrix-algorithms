@@ -5,7 +5,7 @@
 
   <groupId>nz.ac.waikato.cms.adams</groupId>
   <artifactId>matrix-algorithms</artifactId>
-  <version>0.0.13-SNAPSHOT</version>
+  <version>0.0.17-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <parent>
@@ -140,7 +140,13 @@
     <dependency>
       <groupId>org.ojalgo</groupId>
       <artifactId>ojalgo</artifactId>
-      <version>46.0.0</version>
+      <version>48.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math</artifactId>
+      <version>2.2</version>
     </dependency>
   </dependencies>
 

@@ -18,7 +18,7 @@ Supervised:
 * [Kernel PLS (KernelPLS)](http://www.plantbreeding.wzw.tum.de/fileadmin/w00bdb/www/kraemer/icml_kernelpls.pdf)
 * [Orthogonal Signal Correction (OPLS)](https://www.r-bloggers.com/evaluation-of-orthogonal-signal-correction-for-pls-modeling-osc-pls-and-opls/)
 * [Nonlinear Iterative PLS (NIPALS)](http://www.statsoft.com/textbook/partial-least-squares/#NIPALS)
-* [Sprase PLS (SparsePLS)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2810828/)
+* [Sparse PLS (SparsePLS)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2810828/)
 * [Y Gradient based Generalized Least Squares Weighting (YGradientGLSW)](http://wiki.eigenvector.com/index.php?title=Advanced_Preprocessing:_Multivariate_Filtering#GLSW_Algorithm)
 * [Y Gradient based External Parameter Orthogonalization (YGradientEPO)](http://wiki.eigenvector.com/index.php?title=Advanced_Preprocessing:_Multivariate_Filtering#External_Parameter_Orthogonalization_.28EPO.29)
 * [Canonical Correlation Analysis (CCA)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.30.16)
@@ -42,7 +42,7 @@ Add the following dependency to your `pom.xml`:
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
       <artifactId>matrix-algorithms</artifactId>
-      <version>0.0.12</version>
+      <version>0.0.16</version>
     </dependency>
 ```
 ## Examples
@@ -50,49 +50,65 @@ Add the following dependency to your `pom.xml`:
 ### PCA
 
 ```java
-import Jama.Matrix;
-import com.github.waikatodatamining.matrix.algorithm.PCA;
-import com.github.waikatodatamining.matrix.core.MatrixHelper;
-...
-Matrix data = MatrixHelper.read("bolts.csv", true, ',');
-// remove the class column, if present
-//data = MatrixHelper.deleteCol(data, data.getColumnDimension() - 1);
+import com.github.waikatodatamining.matrix.core.matrix.Matrix;
+import com.github.waikatodatamining.matrix.algorithms.PCA;
+import com.github.waikatodatamining.matrix.core.matrix.MatrixHelper;
 
-System.out.println("\nInput");
-System.out.println(MatrixHelper.toString(data));
+public class Main {
+  public static void main(String[] args) {
+    
+    Matrix data = MatrixHelper.read("bolts.csv", true, ',');
+    // remove the class column, if present
+    //data = MatrixHelper.deleteCol(data, data.getColumnDimension() - 1);
+    
+    System.out.println("\nInput");
+    System.out.println(MatrixHelper.toString(data));
+    
+    PCA pca = new PCA();
+    Matrix transformed = pca.transform(data);
+    System.out.println("\nTransformed");
+    System.out.println(MatrixHelper.toString(transformed));
+    
+  }
+}
 
-PCA pca = new PCA();
-Matrix transformed = pca.transform(data);
-System.out.println("\nTransformed");
-System.out.println(MatrixHelper.toString(transformed));
+
 ```
 
 ### SIMPLS
 ```java
-import Jama.Matrix;
-import com.github.waikatodatamining.matrix.algorithm.pls.SIMPLS;
-import com.github.waikatodatamining.matrix.core.MatrixHelper;
-...
-Matrix predictors = MatrixHelper.read("bolts.csv", true, ',');
-Matrix response = MatrixHelper.read("bolts_response.csv", true, ',');
+import com.github.waikatodatamining.matrix.core.matrix.Matrix;
+import com.github.waikatodatamining.matrix.algorithms.pls.SIMPLS;
+import com.github.waikatodatamining.matrix.core.matrix.MatrixHelper;
 
-System.out.println("\nPredictors");
-System.out.println(MatrixHelper.toString(predictors));
-
-System.out.println("\nResponse");
-System.out.println(MatrixHelper.toString(response));
-
-SIMPLS pls = new SIMPLS();
-pls.setNumComponents(3);
-String msg = pls.initialize(predictors, response);
-if (msg != null) {
-  System.out.println("\nInitialization failed:\n" + msg);
-  return;
+public class Main {
+  public static void main(String[] args) {
+    
+    Matrix predictors = MatrixHelper.read("bolts.csv", true, ',');
+    Matrix response = MatrixHelper.read("bolts_response.csv", true, ',');
+    
+    System.out.println("\nPredictors");
+    System.out.println(MatrixHelper.toString(predictors));
+    
+    System.out.println("\nResponse");
+    System.out.println(MatrixHelper.toString(response));
+    
+    SIMPLS pls = new SIMPLS();
+    pls.setNumComponents(3);
+    try {
+      pls.configure(predictors, response);
+    } catch (Exception e) {
+      System.out.println("\nInitialization failed:\n" + e);
+      return;
+    }
+    
+    System.out.println("\nTransformed");
+    System.out.println(MatrixHelper.toString(pls.transform(predictors)));
+    System.out.println("\nPredictions");
+    System.out.println(MatrixHelper.toString(pls.predict(predictors)));
+    System.out.println("\nLoadings");
+    System.out.println(MatrixHelper.toString(pls.getLoadings()));
+    
+  }
 }
-System.out.println("\nTransformed");
-System.out.println(MatrixHelper.toString(pls.transform(predictors)));
-System.out.println("\nPredictions");
-System.out.println(MatrixHelper.toString(pls.predict(predictors)));
-System.out.println("\nLoadings");
-System.out.println(MatrixHelper.toString(pls.getLoadings()));
 ```

@@ -101,10 +101,8 @@ public class Utils {
     r--;
     while (true) {
       while ((array[index[++l]] < pivot)) {
-        ;
       }
       while ((array[index[--r]] > pivot)) {
-        ;
       }
       if (l >= r) {
         return l;
@@ -241,6 +239,60 @@ public class Utils {
   }
 
   /**
+   * Calculates the slope and intercept between the two arrays.
+   *
+   * @param x		the first array, representing the X values
+   * @param y		the second array, representing the Y values
+   * @return		intercept/slope
+   */
+  public static double[] linearRegression(double[] x, double[] y) {
+    int n = x.length;
+    double[] xTimesy = new double[n];
+    for (int i = 0; i < n; i++)
+      xTimesy[i] = x[i] * y[i];
+
+    double a = (sum(y) * sumOfSquares(x) - sum(x) * sum(xTimesy))
+               / (n * sumOfSquares(x) - Math.pow(sum(x), 2.0));
+
+    double b = (n * sum(xTimesy) - sum(x) * sum(y))
+               / (n * sumOfSquares(x) - Math.pow(sum(x), 2.0));
+
+    return new double[] { a, b };
+  }
+
+  /**
+   * Returns sum of the squares of all the elements in the array.
+   *
+   * @param doubles	the array to work on
+   * @return		the sum
+   */
+  public static double sumOfSquares(double[] doubles) {
+    double sum = 0.0;
+
+    for (double d : doubles)
+      sum += d * d;
+
+    return sum;
+  }
+
+  /**
+   * Turns the Number array into one consisting of primitive doubles.
+   *
+   * @param array	the array to convert
+   * @return		the converted array
+   */
+  public static double[] toDoubleArray(Number[] array) {
+    double[]	result;
+    int		i;
+
+    result = new double[array.length];
+    for (i = 0; i < array.length; i++)
+      result[i] = array[i].doubleValue();
+
+    return result;
+  }
+
+  /**
    * Returns index of maximum element in a given array of doubles. First maximum
    * is returned.
    *
@@ -304,7 +356,7 @@ public class Utils {
       factor    = Math.pow(10, afterDecimalPoint);
       valueNew  = Math.floor(value * factor) / factor;
       result    = new StringBuilder(Long.toString(Math.round(Math.floor(valueNew))));
-      remainder = new StringBuilder("" + (long) Math.round((valueNew - Math.floor(valueNew)) * Math.pow(10, afterDecimalPoint)));
+      remainder = new StringBuilder("" + Math.round((valueNew - Math.floor(valueNew)) * Math.pow(10, afterDecimalPoint)));
       remainder.delete(0, remainder.indexOf("" + separator) + 1);
       if (afterDecimalPoint > 0) {
 	while (remainder.length() < afterDecimalPoint)
@@ -410,5 +462,21 @@ public class Utils {
    */
   public static String arrayToString(Object array) {
     return arrayToString(array, false);
+  }
+
+  /**
+   * Normalises a value against a given mean/standard deviation.
+   *
+   * @param value   The value to normalise.
+   * @param mean    The mean of the distribution.
+   * @param stdDev  The standard deviation of the distribution.
+   * @return        The normalised value.
+   */
+  public static double normalise(double value, double mean, double stdDev) {
+    // Avoid divide-by-zero error
+    if (stdDev == 0.0)
+      return value - mean;
+
+    return (value - mean) / stdDev;
   }
 }
